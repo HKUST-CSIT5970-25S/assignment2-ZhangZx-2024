@@ -54,6 +54,20 @@ public class BigramFrequencyStripes extends Configured implements Tool {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
+			if (words.length > 1){
+				KEY.set( words[0]);
+				for (int i = 1; i < words.length; i++) {
+					String w = words[i];
+					// Skip empty words
+					if (w.length() == 0) {
+						continue;
+					}
+					STRIPE.increment(w);
+					context.write(KEY, STRIPE);
+					KEY.set(w);
+					STRIPE.clear();
+				}
+			}
 		}
 	}
 
@@ -75,6 +89,30 @@ public class BigramFrequencyStripes extends Configured implements Tool {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
+			Iterator<HashMapStringIntWritable> iter = stripes.iterator();
+			String first_w = key.toString();
+			while (iter.hasNext()) {
+				SUM_STRIPES.plus(iter.next());
+			}
+
+			int count = 0
+			
+	        for (Entry<String, Integer> mapElement : SUM_STRIPES.entrySet()) {
+	            int value = (int) mapElement.getValue();
+				count = count + value
+	        }
+			BIGRAM.set(first_w, "");
+	        FREQ.set((float) count);
+			context.write(BIGRAM, FREQ);
+
+			for (Entry<String, Integer> mapElement : SUM_STRIPES.entrySet()) { 
+	            String second_w = (String) mapElement.getKey(); 
+	            int value = (int) mapElement.getValue();
+	            BIGRAM.set(first_w, second_w);
+	            FREQ.set((float) value / (float) count);
+	            context.write(BIGRAM, FREQ);
+	        }
+	        SUM_STRIPES.clear();
 		}
 	}
 
