@@ -136,7 +136,7 @@ public class CORStripes extends Configured implements Tool {
 			Iterator<MapWritable> iter = values.iterator();
 			STRIPE.clear();
 			while (iter.hasNext()) {
-				for (Text second_w : iter.next().keySet()) {
+				for (Writable second_w : iter.next().keySet()) {
 					if (STRIPE.containsKey(second_w)){
 						new_count.set(STRIPE.get(second_w).get() + 1);
 						STRIPE.put(second_w, new_count);
@@ -203,9 +203,9 @@ public class CORStripes extends Configured implements Tool {
 			 * TODO: Your implementation goes here.
 			 */
 			Iterator<MapWritable> iter = values.iterator();
-			Map<Text, Integer> stripe = new HashMap<Text, Integer>();
+			Map<Writable, Integer> stripe = new HashMap<Writable, Integer>();
 			while (iter.hasNext()) {
-				for (Text second_w : iter.next().keySet()) {
+				for (Writable second_w : iter.next().keySet()) {
 					if (stripe.containsKey(second_w)){
 						stripe.put(second_w, stripe.get(second_w) + 1);
 					}
