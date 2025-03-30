@@ -150,7 +150,6 @@ public class CORStripes extends Configured implements Tool {
 					}
 				}
 			}
-			System.out.println("ccombiner" + STRIPE.size());
 			context.write(key, STRIPE);
 		}
 	}
@@ -226,13 +225,12 @@ public class CORStripes extends Configured implements Tool {
 				}
 			}
 
-			System.out.println("rreducer" + stripe.size());
-
 			String prev_word = key.toString();
 			for (Map.Entry<Text, Integer> entry : stripe.entrySet()) {
 				String next_word = entry.getKey().toString();
 				BIGRAM.set(prev_word, next_word);
 				FREQ.set((double) entry.getValue() / ((double) (word_total_map.get(prev_word) *  word_total_map.get(next_word))));
+				FREQ.set((double)stripe.size())
 				context.write(BIGRAM, FREQ);
 			}
 		}
