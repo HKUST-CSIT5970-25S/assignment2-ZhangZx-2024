@@ -228,7 +228,7 @@ public class CORStripes extends Configured implements Tool {
 			for (Map.Entry<Text, Integer> entry : stripe.entrySet()) {
 				String next_word = entry.getKey().toString();
 				BIGRAM.set(prev_word, next_word);
-				FREQ.set((double) entry.getValue() / ((double) word_total_map.get(key.getLeftElement()) * (double) word_total_map.get(key.getRightElement())));
+				FREQ.set((double) entry.getValue() / ((double) word_total_map.get(prev_word) * (double) word_total_map.get(next_word)));
 				context.write(BIGRAM, FREQ);
 			}
 		}
