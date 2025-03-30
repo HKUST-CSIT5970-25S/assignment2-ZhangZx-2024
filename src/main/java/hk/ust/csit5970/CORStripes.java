@@ -144,12 +144,10 @@ public class CORStripes extends Configured implements Tool {
 					if (STRIPE.containsKey(second_word)){
 						old_count.set(((IntWritable) STRIPE.get(second_word)).get());
 						new_count.set(old_count.get() + 1);
-						// STRIPE.put(second_word, new_count);
-						STRIPE.put(second_word, new IntWritable(3));
+						STRIPE.put(second_word, new_count);
 					}
 					else{
-						// STRIPE.put(second_word, ONE);
-						STRIPE.put(second_word, new IntWritable(count));
+						STRIPE.put(second_word, ONE);
 					}
 				}
 			}
@@ -167,7 +165,6 @@ public class CORStripes extends Configured implements Tool {
 		private static final PairOfStrings BIGRAM = new PairOfStrings();
 
 		private static IntWritable old_count = new IntWritable();
-		private static Text second_word = new Text();
 
 		/*
 		 * Preload the middle result file.
@@ -217,7 +214,7 @@ public class CORStripes extends Configured implements Tool {
 			while (iter.hasNext()) {
 				MapWritable currentMap = iter.next();
 				for (Writable second_w : currentMap.keySet()) {
-					second_word.set((Text) second_w);
+					Text second_word = new Text(((Text) second_w).toString());
 					old_count.set(((IntWritable) currentMap.get(second_word)).get());
 					if (stripe.containsKey(second_word)){
 						stripe.put(second_word, stripe.get(second_word) + old_count.get());
@@ -232,8 +229,7 @@ public class CORStripes extends Configured implements Tool {
 			for (Map.Entry<Text, Integer> entry : stripe.entrySet()) {
 				String next_word = entry.getKey().toString();
 				BIGRAM.set(prev_word, next_word);
-				// FREQ.set((double) entry.getValue() / ((double) (word_total_map.get(prev_word) *  word_total_map.get(next_word))));
-				FREQ.set((double) entry.getValue());
+				FREQ.set((double) entry.getValue() / ((double) (word_total_map.get(prev_word) *  word_total_map.get(next_word))));
 				context.write(BIGRAM, FREQ);
 			}
 		}
