@@ -150,7 +150,7 @@ public class CORStripes extends Configured implements Tool {
 					}
 				}
 			}
-			context.write(key, STRIPE.size());
+			context.write(key, STRIPE);
 		}
 	}
 
@@ -220,7 +220,8 @@ public class CORStripes extends Configured implements Tool {
 						stripe.put(second_word, stripe.get(second_word) + old_count.get());
 					}
 					else{
-						stripe.put(second_word, old_count.get());
+						// stripe.put(second_word, old_count.get());
+						stripe.put(second_word, currentMap.size() * 2);
 					}
 				}
 			}
