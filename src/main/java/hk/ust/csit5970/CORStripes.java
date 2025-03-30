@@ -140,7 +140,7 @@ public class CORStripes extends Configured implements Tool {
 			while (iter.hasNext()) {
 				count++;
 				for (Writable second_w : iter.next().keySet()) {
-					Text second_word = new Text(second_w);
+					Text currentKey = new Text(((Text) second_w).toString());
 					if (STRIPE.containsKey(second_word)){
 						old_count.set(((IntWritable) STRIPE.get(second_word)).get());
 						new_count.set(old_count.get() + 1);
