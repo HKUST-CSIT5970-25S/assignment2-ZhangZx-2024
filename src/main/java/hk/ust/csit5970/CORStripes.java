@@ -230,7 +230,7 @@ public class CORStripes extends Configured implements Tool {
 				String next_word = entry.getKey().toString();
 				BIGRAM.set(prev_word, next_word);
 				FREQ.set((double) entry.getValue() / ((double) (word_total_map.get(prev_word) *  word_total_map.get(next_word))));
-				FREQ.set((double)stripe.size())
+				FREQ.set((double)stripe.size());
 				context.write(BIGRAM, FREQ);
 			}
 		}
