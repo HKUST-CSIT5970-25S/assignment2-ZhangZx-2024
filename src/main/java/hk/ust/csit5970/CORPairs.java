@@ -31,6 +31,8 @@ import java.net.URI;
 import java.util.*;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.HashSet
 
 /**
  * Compute the bigram count using "pairs" approach
@@ -43,6 +45,9 @@ public class CORPairs extends Configured implements Tool {
 	 */
 	private static class CORMapper1 extends
 			Mapper<LongWritable, Text, Text, IntWritable> {
+
+		private static final IntWritable ONE = new IntWritable(1);
+
 		@Override
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
@@ -53,7 +58,10 @@ public class CORPairs extends Configured implements Tool {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
-			
+			while (doc_tokenizer.hasMoreTokens()) {
+				String word = doc_tokenizer.nextToken()
+				context.write(new Text(word), ONE);
+			}
 		}
 	}
 
@@ -62,11 +70,21 @@ public class CORPairs extends Configured implements Tool {
 	 */
 	private static class CORReducer1 extends
 			Reducer<Text, IntWritable, Text, IntWritable> {
+
+		private final static IntWritable SUM = new IntWritable();
+
 		@Override
 		public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
+			Iterator<IntWritable> iter = values.iterator();
+			int sum = 0;
+			while (iter.hasNext()) {
+				sum += iter.next().get();
+			}
+			SUM.set(sum);
+			context.write(key, SUM);
 		}
 	}
 
@@ -75,6 +93,10 @@ public class CORPairs extends Configured implements Tool {
 	 * TODO: Write your second-pass Mapper here.
 	 */
 	public static class CORPairsMapper2 extends Mapper<LongWritable, Text, PairOfStrings, IntWritable> {
+
+		private static final IntWritable ONE = new IntWritable(1);
+		private static final PairOfStrings BIGRAM = new PairOfStrings();
+
 		@Override
 		protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			// Please use this tokenizer! DO NOT implement a tokenizer by yourself!
@@ -82,6 +104,24 @@ public class CORPairs extends Configured implements Tool {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
+			Set<String> word_set = new HashSet<>();
+			while (doc_tokenizer.hasMoreTokens()) {
+				word_set.add(doc_tokenizer.nextToken());
+			}
+			List<String> words = new ArrayList<>(uniqueWords);
+			for (int i = 0; i < words.size(); i++) {
+				for (int j = i + 1; j < words.size(); j++) {
+					String a = words.get(i);
+					String b = words.get(j);
+					if (a.compareTo(b) < 0){
+						BIGRAM.set(a, b)
+					}
+					else{
+						BIGRAM.set(b, a)
+					}
+					context.write(BIGRAM, ONE);
+				}
+			}
 		}
 	}
 
@@ -89,11 +129,21 @@ public class CORPairs extends Configured implements Tool {
 	 * TODO: Write your second-pass Combiner here.
 	 */
 	private static class CORPairsCombiner2 extends Reducer<PairOfStrings, IntWritable, PairOfStrings, IntWritable> {
+
+		private final static IntWritable SUM = new IntWritable();
+
 		@Override
 		protected void reduce(PairOfStrings key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
+			Iterator<IntWritable> iter = values.iterator();
+			int sum = 0;
+			while (iter.hasNext()) {
+				sum += iter.next().get();
+			}
+			SUM.set(sum);
+			context.write(key, SUM);
 		}
 	}
 
@@ -102,6 +152,7 @@ public class CORPairs extends Configured implements Tool {
 	 */
 	public static class CORPairsReducer2 extends Reducer<PairOfStrings, IntWritable, PairOfStrings, DoubleWritable> {
 		private final static Map<String, Integer> word_total_map = new HashMap<String, Integer>();
+		private final static FloatWritable FREQ = new FloatWritable();
 
 		/*
 		 * Preload the middle result file.
@@ -146,6 +197,13 @@ public class CORPairs extends Configured implements Tool {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
+			Iterator<IntWritable> iter = values.iterator();
+			int sum = 0;
+			while (iter.hasNext()) {
+				sum += iter.next().get();
+			}
+			FREQ.set((float) sum / (float) word_total_map.get(key.getLeftElement()) / (float) word_total_map.get(key.getRightElement()))
+			context.write(key, FREQ);
 		}
 	}
 
