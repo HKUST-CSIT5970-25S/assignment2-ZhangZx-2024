@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.HashSet
+import java.util.HashSet;
 
 /**
  * Compute the bigram count using "pairs" approach
@@ -59,7 +59,7 @@ public class CORPairs extends Configured implements Tool {
 			 * TODO: Your implementation goes here.
 			 */
 			while (doc_tokenizer.hasMoreTokens()) {
-				String word = doc_tokenizer.nextToken()
+				String word = doc_tokenizer.nextToken();
 				context.write(new Text(word), ONE);
 			}
 		}
@@ -104,11 +104,11 @@ public class CORPairs extends Configured implements Tool {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
-			Set<String> word_set = new HashSet<>();
+			Set<String> word_set = new HashSet<String>();
 			while (doc_tokenizer.hasMoreTokens()) {
 				word_set.add(doc_tokenizer.nextToken());
 			}
-			List<String> words = new ArrayList<>(uniqueWords);
+			List<String> words = new ArrayList<String>(uniqueWords);
 			for (int i = 0; i < words.size(); i++) {
 				for (int j = i + 1; j < words.size(); j++) {
 					String a = words.get(i);
