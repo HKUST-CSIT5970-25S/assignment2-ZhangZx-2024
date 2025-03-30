@@ -137,16 +137,20 @@ public class CORStripes extends Configured implements Tool {
 			 */
 			Iterator<MapWritable> iter = values.iterator();
 			STRIPE.clear();
+			int count = 0;
 			while (iter.hasNext()) {
+				count++;
 				for (Writable second_w : iter.next().keySet()) {
 					second_word.set((Text) second_w);
 					if (STRIPE.containsKey(second_word)){
 						old_count.set(((IntWritable) STRIPE.get(second_word)).get());
 						new_count.set(old_count.get() + 1);
-						STRIPE.put(second_word, new_count);
+						// STRIPE.put(second_word, new_count);
+						STRIPE.put(second_word, new IntWritable(3));
 					}
 					else{
-						STRIPE.put(second_word, ONE);
+						// STRIPE.put(second_word, ONE);
+						STRIPE.put(second_word, new IntWritable(count));
 					}
 				}
 			}
@@ -220,8 +224,7 @@ public class CORStripes extends Configured implements Tool {
 						stripe.put(second_word, stripe.get(second_word) + old_count.get());
 					}
 					else{
-						// stripe.put(second_word, old_count.get());
-						stripe.put(second_word, currentMap.size() * 2);
+						stripe.put(second_word, old_count.get());
 					}
 				}
 			}
