@@ -126,7 +126,6 @@ public class CORStripes extends Configured implements Tool {
 		private static IntWritable ONE = new IntWritable(1);
 		private static IntWritable old_count = new IntWritable();
 		private static IntWritable new_count = new IntWritable();
-		private static Text second_word = new Text();
 
 		MapWritable STRIPE = new MapWritable();
 
@@ -141,7 +140,7 @@ public class CORStripes extends Configured implements Tool {
 			while (iter.hasNext()) {
 				count++;
 				for (Writable second_w : iter.next().keySet()) {
-					second_word.set((Text) second_w);
+					Text second_word = new Text(second_w);
 					if (STRIPE.containsKey(second_word)){
 						old_count.set(((IntWritable) STRIPE.get(second_word)).get());
 						new_count.set(old_count.get() + 1);
