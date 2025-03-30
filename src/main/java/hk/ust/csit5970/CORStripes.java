@@ -221,7 +221,7 @@ public class CORStripes extends Configured implements Tool {
 					}
 					else{
 						// stripe.put(second_word, old_count.get());
-						stripe.put(second_word, currentMap.size())
+						stripe.put(second_word, currentMap.size());
 					}
 				}
 			}
