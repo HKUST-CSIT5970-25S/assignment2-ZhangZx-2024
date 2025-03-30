@@ -114,10 +114,10 @@ public class CORPairs extends Configured implements Tool {
 					String a = words.get(i);
 					String b = words.get(j);
 					if (a.compareTo(b) < 0){
-						BIGRAM.set(a, b)
+						BIGRAM.set(a, b);
 					}
 					else{
-						BIGRAM.set(b, a)
+						BIGRAM.set(b, a);
 					}
 					context.write(BIGRAM, ONE);
 				}
@@ -202,7 +202,7 @@ public class CORPairs extends Configured implements Tool {
 			while (iter.hasNext()) {
 				sum += iter.next().get();
 			}
-			FREQ.set((float) sum / (float) word_total_map.get(key.getLeftElement()) / (float) word_total_map.get(key.getRightElement()))
+			FREQ.set((float) sum / (float) word_total_map.get(key.getLeftElement()) / (float) word_total_map.get(key.getRightElement()));
 			context.write(key, FREQ);
 		}
 	}
