@@ -110,8 +110,8 @@ public class CORPairs extends Configured implements Tool {
 			}
 			List<String> words = new ArrayList<String>(word_set);
 			for (int i = 0; i < words.size(); i++) {
+				String a = words.get(i);
 				for (int j = i + 1; j < words.size(); j++) {
-					String a = words.get(i);
 					String b = words.get(j);
 					if (a.compareTo(b) < 0){
 						BIGRAM.set(a, b);
@@ -202,7 +202,7 @@ public class CORPairs extends Configured implements Tool {
 			while (iter.hasNext()) {
 				sum += iter.next().get();
 			}
-			FREQ.set((double) sum / (double) word_total_map.get(key.getLeftElement()) / (double) word_total_map.get(key.getRightElement()));
+			FREQ.set((double) sum / ((double) word_total_map.get(key.getLeftElement()) * (double) word_total_map.get(key.getRightElement())));
 			context.write(key, FREQ);
 		}
 	}
