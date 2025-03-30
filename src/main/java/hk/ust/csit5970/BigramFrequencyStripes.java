@@ -95,11 +95,11 @@ public class BigramFrequencyStripes extends Configured implements Tool {
 				SUM_STRIPES.plus(iter.next());
 			}
 
-			int count = 0
+			int count = 0;
 			
 	        for (Entry<String, Integer> mapElement : SUM_STRIPES.entrySet()) {
 	            int value = (int) mapElement.getValue();
-				count = count + value
+				count = count + value;
 	        }
 			BIGRAM.set(first_w, "");
 	        FREQ.set((float) count);
