@@ -21,9 +21,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
- * Compute the bigram count using "pairs" approach
+ * Compute the bigram count using "stripes" approach
  */
 public class CORStripes extends Configured implements Tool {
 	private static final Logger LOG = Logger.getLogger(CORStripes.class);
@@ -33,6 +34,9 @@ public class CORStripes extends Configured implements Tool {
 	 */
 	private static class CORMapper1 extends
 			Mapper<LongWritable, Text, Text, IntWritable> {
+
+		private static final IntWritable ONE = new IntWritable(1);
+
 		@Override
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
@@ -43,6 +47,10 @@ public class CORStripes extends Configured implements Tool {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
+			while (doc_tokenizer.hasMoreTokens()) {
+				String word = doc_tokenizer.nextToken();
+				context.write(new Text(word), ONE);
+			}
 		}
 	}
 
@@ -51,11 +59,21 @@ public class CORStripes extends Configured implements Tool {
 	 */
 	private static class CORReducer1 extends
 			Reducer<Text, IntWritable, Text, IntWritable> {
+
+		private final static IntWritable SUM = new IntWritable();
+
 		@Override
 		public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
+			Iterator<IntWritable> iter = values.iterator();
+			int sum = 0;
+			while (iter.hasNext()) {
+				sum += iter.next().get();
+			}
+			SUM.set(sum);
+			context.write(key, SUM);
 		}
 	}
 
@@ -63,6 +81,13 @@ public class CORStripes extends Configured implements Tool {
 	 * TODO: Write your second-pass Mapper here.
 	 */
 	public static class CORStripesMapper2 extends Mapper<LongWritable, Text, Text, MapWritable> {
+
+		MapWritable STRIPE = new MapWritable();
+		private static final IntWritable ONE = new IntWritable(1);
+		private static final Text KEY = new Text();
+		private static final Text VAL = new Text();
+
+
 		@Override
 		protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			Set<String> sorted_word_set = new TreeSet<String>();
@@ -75,6 +100,22 @@ public class CORStripes extends Configured implements Tool {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
+			Iterator<String> outer = sorted_word_set.iterator();
+			STRIPE.clear();
+			while (outer.hasNext()) {
+				String a = outer.next();
+				KEY.set(a);
+				Iterator<String> inner = sorted_word_set.iterator();
+				while (inner.hasNext()) {
+					String b = inner.next();
+					if (a.compareTo(b) < 0){
+						VAL.set(b);
+						STRIPE.put(VAL, ONE);
+						context.write(KEY, STRIPE);
+						STRIPE.clear();
+					}
+				}
+			}
 		}
 	}
 
@@ -82,13 +123,30 @@ public class CORStripes extends Configured implements Tool {
 	 * TODO: Write your second-pass Combiner here.
 	 */
 	public static class CORStripesCombiner2 extends Reducer<Text, MapWritable, Text, MapWritable> {
-		static IntWritable ZERO = new IntWritable(0);
+		static IntWritable ONE = new IntWritable(1);
+		static IntWritable new_count = new IntWritable();
+
+		MapWritable STRIPE = new MapWritable();
 
 		@Override
 		protected void reduce(Text key, Iterable<MapWritable> values, Context context) throws IOException, InterruptedException {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
+			Iterator<MapWritable> iter = values.iterator();
+			STRIPE.clear();
+			while (iter.hasNext()) {
+				for (Text second_w : iter.next().keySet()) {
+					if (STRIPE.containsKey(second_w)){
+						new_count.set(STRIPE.get(second_w).get() + 1);
+						STRIPE.put(second_w, new_count);
+					}
+					else{
+						STRIPE.put(second_w, ONE);
+					}
+				}
+			}
+			context.write(key, STRIPE);
 		}
 	}
 
@@ -98,6 +156,8 @@ public class CORStripes extends Configured implements Tool {
 	public static class CORStripesReducer2 extends Reducer<Text, MapWritable, PairOfStrings, DoubleWritable> {
 		private static Map<String, Integer> word_total_map = new HashMap<String, Integer>();
 		private static IntWritable ZERO = new IntWritable(0);
+		private static DoubleWritable FREQ = new DoubleWritable();
+		private static final PairOfStrings BIGRAM = new PairOfStrings();
 
 		/*
 		 * Preload the middle result file.
@@ -142,6 +202,26 @@ public class CORStripes extends Configured implements Tool {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
+			Iterator<MapWritable> iter = values.iterator();
+			private Map<Text, Integer> stripe = new HashMap<>();
+			while (iter.hasNext()) {
+				for (Text second_w : iter.next().keySet()) {
+					if (stripe.containsKey(second_w)){
+						stripe.put(second_w, stripe.get(second_w) + 1);
+					}
+					else{
+						stripe.put(second_w, 1);
+					}
+				}
+			}
+
+			String prev_word = key.toString();
+			for (Map.Entry<Text, Integer> entry : stripe.entrySet()) {
+				String next_word = entry.getKey().toString();
+				BIGRAM.set(prev_word, next_word);
+				FREQ.set((double) entry.getValue() / ((double) word_total_map.get(key.getLeftElement()) * (double) word_total_map.get(key.getRightElement())));
+				context.write(BIGRAM, FREQ);
+			}
 		}
 	}
 
