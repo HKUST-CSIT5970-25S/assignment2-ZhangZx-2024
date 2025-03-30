@@ -212,9 +212,10 @@ public class CORStripes extends Configured implements Tool {
 			Iterator<MapWritable> iter = values.iterator();
 			Map<Text, Integer> stripe = new HashMap<Text, Integer>();
 			while (iter.hasNext()) {
-				for (Writable second_w : iter.next().keySet()) {
+				MapWritable currentMap = iter.next();
+				for (Writable second_w : currentMap.keySet()) {
 					second_word.set((Text) second_w);
-					old_count.set(((IntWritable) iter.next().get(second_word)).get());
+					old_count.set(((IntWritable) currentMap.get(second_word)).get());
 					if (stripe.containsKey(second_word)){
 						stripe.put(second_word, stripe.get(second_word) + old_count.get());
 					}
