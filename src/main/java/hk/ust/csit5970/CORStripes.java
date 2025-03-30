@@ -203,7 +203,7 @@ public class CORStripes extends Configured implements Tool {
 			 * TODO: Your implementation goes here.
 			 */
 			Iterator<MapWritable> iter = values.iterator();
-			private Map<Text, Integer> stripe = new HashMap<Text, Integer>();
+			Map<Text, Integer> stripe = new HashMap<Text, Integer>();
 			while (iter.hasNext()) {
 				for (Text second_w : iter.next().keySet()) {
 					if (stripe.containsKey(second_w)){
