@@ -108,7 +108,7 @@ public class CORPairs extends Configured implements Tool {
 			while (doc_tokenizer.hasMoreTokens()) {
 				word_set.add(doc_tokenizer.nextToken());
 			}
-			List<String> words = new ArrayList<String>(uniqueWords);
+			List<String> words = new ArrayList<String>(word_set);
 			for (int i = 0; i < words.size(); i++) {
 				for (int j = i + 1; j < words.size(); j++) {
 					String a = words.get(i);
