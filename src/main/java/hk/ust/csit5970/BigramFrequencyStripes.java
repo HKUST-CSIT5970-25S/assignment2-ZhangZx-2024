@@ -135,6 +135,15 @@ public class BigramFrequencyStripes extends Configured implements Tool {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
+			Iterator<HashMapStringIntWritable> iter = stripes.iterator();
+
+			while (iter.hasNext()) {
+				for ( String second_w : iter.next().keySet() ) {
+					SUM_STRIPES.increment(second_w);
+				}
+			}
+			context.write(key, SUM_STRIPES);
+			SUM_STRIPES.clear();
 		}
 	}
 
