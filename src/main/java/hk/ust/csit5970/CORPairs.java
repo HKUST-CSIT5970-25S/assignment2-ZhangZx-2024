@@ -152,7 +152,7 @@ public class CORPairs extends Configured implements Tool {
 	 */
 	public static class CORPairsReducer2 extends Reducer<PairOfStrings, IntWritable, PairOfStrings, DoubleWritable> {
 		private final static Map<String, Integer> word_total_map = new HashMap<String, Integer>();
-		private final static FloatWritable FREQ = new FloatWritable();
+		private final static DoubleWritable FREQ = new DoubleWritable();
 
 		/*
 		 * Preload the middle result file.
@@ -202,7 +202,7 @@ public class CORPairs extends Configured implements Tool {
 			while (iter.hasNext()) {
 				sum += iter.next().get();
 			}
-			FREQ.set((float) sum / (float) word_total_map.get(key.getLeftElement()) / (float) word_total_map.get(key.getRightElement()));
+			FREQ.set((double) sum / (double) word_total_map.get(key.getLeftElement()) / (double) word_total_map.get(key.getRightElement()));
 			context.write(key, FREQ);
 		}
 	}
