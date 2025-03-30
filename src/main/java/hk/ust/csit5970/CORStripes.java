@@ -123,8 +123,10 @@ public class CORStripes extends Configured implements Tool {
 	 * TODO: Write your second-pass Combiner here.
 	 */
 	public static class CORStripesCombiner2 extends Reducer<Text, MapWritable, Text, MapWritable> {
-		static IntWritable ONE = new IntWritable(1);
-		static IntWritable new_count = new IntWritable();
+		private static IntWritable ONE = new IntWritable(1);
+		private static IntWritable old_count = new IntWritable();
+		private static IntWritable new_count = new IntWritable();
+		private static Text second_word = new Text();
 
 		MapWritable STRIPE = new MapWritable();
 
@@ -137,12 +139,14 @@ public class CORStripes extends Configured implements Tool {
 			STRIPE.clear();
 			while (iter.hasNext()) {
 				for (Writable second_w : iter.next().keySet()) {
-					if (STRIPE.containsKey(second_w)){
-						new_count.set(STRIPE.get(second_w).get() + 1);
-						STRIPE.put(second_w, new_count);
+					second_word.set((Text) second_w);
+					if (STRIPE.containsKey(second_word)){
+						old_count.set((IntWritable) STRIPE.get(second_word));
+						new_count.set(old_count.get() + 1);
+						STRIPE.put(second_word, new_count);
 					}
 					else{
-						STRIPE.put(second_w, ONE);
+						STRIPE.put(second_word, ONE);
 					}
 				}
 			}
@@ -158,6 +162,9 @@ public class CORStripes extends Configured implements Tool {
 		private static IntWritable ZERO = new IntWritable(0);
 		private static DoubleWritable FREQ = new DoubleWritable();
 		private static final PairOfStrings BIGRAM = new PairOfStrings();
+
+		private static IntWritable old_count = new IntWritable();
+		private static Text second_word = new Text();
 
 		/*
 		 * Preload the middle result file.
@@ -203,14 +210,16 @@ public class CORStripes extends Configured implements Tool {
 			 * TODO: Your implementation goes here.
 			 */
 			Iterator<MapWritable> iter = values.iterator();
-			Map<Writable, Integer> stripe = new HashMap<Writable, Integer>();
+			Map<Text, Integer> stripe = new HashMap<Text, Integer>();
 			while (iter.hasNext()) {
 				for (Writable second_w : iter.next().keySet()) {
-					if (stripe.containsKey(second_w)){
-						stripe.put(second_w, stripe.get(second_w) + 1);
+					second_word.set((Text) second_w);
+					old_count.set((IntWritable) values.get(second_word));
+					if (stripe.containsKey(second_word)){
+						stripe.put(second_word, stripe.get(second_word) + old_count.get());
 					}
 					else{
-						stripe.put(second_w, 1);
+						stripe.put(second_word, old_count.get());
 					}
 				}
 			}
