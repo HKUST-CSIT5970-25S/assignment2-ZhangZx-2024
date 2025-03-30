@@ -141,7 +141,7 @@ public class CORStripes extends Configured implements Tool {
 				for (Writable second_w : iter.next().keySet()) {
 					second_word.set((Text) second_w);
 					if (STRIPE.containsKey(second_word)){
-						old_count.set((int) STRIPE.get(second_word));
+						old_count.set(((IntWritable) STRIPE.get(second_word)).get());
 						new_count.set(old_count.get() + 1);
 						STRIPE.put(second_word, new_count);
 					}
@@ -214,7 +214,7 @@ public class CORStripes extends Configured implements Tool {
 			while (iter.hasNext()) {
 				for (Writable second_w : iter.next().keySet()) {
 					second_word.set((Text) second_w);
-					old_count.set((int) iter.next().get(second_word));
+					old_count.set(((IntWritable) iter.next().get(second_word)).get());
 					if (stripe.containsKey(second_word)){
 						stripe.put(second_word, stripe.get(second_word) + old_count.get());
 					}
